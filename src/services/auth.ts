@@ -26,7 +26,7 @@ export async function checkAuthStatus(): Promise<boolean> {
     const data = await res.json().catch(() => null);
     return Boolean(data && data.authenticated);
   } catch (err) {
-    console.error('Failed to check auth status:', err);
+    console.error('[Auth Status Error]', err);
     return false;
   }
 }
@@ -47,31 +47,36 @@ export async function loginWithPassphrase(passphrase: string): Promise<AuthRespo
     if (contentType.includes('application/json')) {
       try {
         data = await res.json();
-      } catch {
+      } catch (jsonErr) {
+        console.error('[Auth Parse Error]', jsonErr);
         data = null;
       }
     }
 
     if (!res.ok) {
-      // Meaningful fallback based on HTTP status code
-      let errorMessage = 'Incorrect passphrase. Please try again! 🌸';
-      if (res.status === 404) {
-        errorMessage = 'Verification server not reached (404). Please ensure serverless functions are configured.';
-      } else if (res.status === 429) {
-        errorMessage = 'Too many attempts. Please wait a minute and try again.';
-      } else if (res.status === 500) {
-        errorMessage = 'Server configuration error. Please verify SITE_PASSPHRASE in environment variables.';
-      }
+      // Log technical details to console for developer debugging
+      console.error(`[Auth Request Failed] Status ${res.status}:`, data);
 
-      // Safely extract error string even if data.error is an object (preventing React error #31)
-      if (data) {
-        if (typeof data.error === 'string') {
+      let errorMessage = 'Incorrect passphrase. Please try again! 🌸';
+
+      if (res.status === 401) {
+        // Specifically invalid password credentials
+        if (data && typeof data.error === 'string') {
           errorMessage = data.error;
-        } else if (data.error && typeof data.error === 'object' && typeof data.error.message === 'string') {
-          errorMessage = data.error.message;
-        } else if (typeof data.message === 'string') {
-          errorMessage = data.message;
+        } else {
+          errorMessage = 'Incorrect passphrase. Please try again! 🌸';
         }
+      } else if (res.status === 429) {
+        // Rate limiting
+        if (data && typeof data.error === 'string') {
+          errorMessage = data.error;
+        } else {
+          errorMessage = 'Too many attempts. Please wait a minute and try again.';
+        }
+      } else {
+        // Server unreachable, 404, or 500 configuration issue
+        // Show friendly public message while keeping tech details in console
+        errorMessage = "We're having trouble opening your scrapbook. Please try again in a moment.";
       }
 
       return {
@@ -86,9 +91,10 @@ export async function loginWithPassphrase(passphrase: string): Promise<AuthRespo
       message
     };
   } catch (err) {
+    console.error('[Auth Network Error]', err);
     return {
       success: false,
-      error: 'Network error connecting to verification server.'
+      error: "We're having trouble opening your scrapbook. Please try again in a moment."
     };
   }
 }
@@ -103,7 +109,7 @@ export async function logoutUser(): Promise<boolean> {
     });
     return res.ok;
   } catch (err) {
-    console.error('Failed to logout:', err);
+    console.error('[Auth Logout Error]', err);
     return false;
   }
 }
