@@ -76,7 +76,7 @@ export const VideoGallery: React.FC = () => {
               </div>
 
               <p style={{ maxWidth: 440, fontSize: '0.85rem', color: '#e0d5df', lineHeight: 1.5 }}>
-                Protected video memory placeholder. When ready, place your video into <code>private_media/video-1.mp4</code> and it will play here through the authenticated route!
+                Video memory placeholder. When ready, place your video into <code>public/media/videos/video-1.mp4</code> and it will play here!
               </p>
 
               <span className="sticker-badge" style={{ backgroundColor: '#473247', color: '#ffb8d1', borderColor: '#e889ac' }}>

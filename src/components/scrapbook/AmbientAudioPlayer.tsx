@@ -29,10 +29,10 @@ export const AmbientAudioPlayer: React.FC = () => {
 
   return (
     <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 1000 }}>
-      {/* Hidden audio element pointing to protected media path */}
+      {/* Hidden audio element pointing to public media path */}
       <audio
         ref={audioRef}
-        src="/api/media/background-melody.mp3"
+        src="/media/audio/background-melody.mp3"
         loop
         preload="none"
         onEnded={() => setIsPlaying(false)}
@@ -87,7 +87,7 @@ export const AmbientAudioPlayer: React.FC = () => {
             Music track ready to be added 🎵
           </p>
           <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
-            Place your MP3 into <code>private_media/background-melody.mp3</code> to hear soft background music!
+            Place your MP3 into <code>public/media/audio/background-melody.mp3</code> to hear soft background music!
           </p>
         </div>
       )}

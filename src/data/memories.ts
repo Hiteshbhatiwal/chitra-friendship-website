@@ -115,7 +115,7 @@ export const videoMemories: MemoryItem[] = [
   {
     id: "video-1",
     type: "video",
-    src: "/api/media/video-1.mp4",
+    src: "/media/videos/video-1.mp4",
     title: "School Memories Clip 🎬",
     caption: "A special moment capturing laughter, chatter, and school friendship.",
     date: "School Video Reel",
