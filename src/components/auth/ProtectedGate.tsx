@@ -17,13 +17,27 @@ export const ProtectedGate: React.FC<ProtectedGateProps> = ({ children }) => {
   // Check existing session on mount
   useEffect(() => {
     let isMounted = true;
-    checkAuthStatus().then((authenticated) => {
+    const timeoutId = setTimeout(() => {
       if (isMounted) {
-        setIsAuthenticated(authenticated);
+        setIsAuthenticated((current) => (current === null ? false : current));
       }
-    });
+    }, 2500);
+
+    checkAuthStatus()
+      .then((authenticated) => {
+        if (isMounted) {
+          setIsAuthenticated(authenticated);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setIsAuthenticated(false);
+        }
+      });
+
     return () => {
       isMounted = false;
+      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -45,7 +59,15 @@ export const ProtectedGate: React.FC<ProtectedGateProps> = ({ children }) => {
       setIsAuthenticated(true);
       setPassphrase('');
     } else {
-      setErrorMessage(result.error || 'Incorrect passphrase. Please try again! 🌸');
+      // Prevent React error #31: Ensure error is guaranteed to be a string
+      const rawError = result.error;
+      let displayError = 'Incorrect passphrase. Please try again! 🌸';
+      if (typeof rawError === 'string') {
+        displayError = rawError;
+      } else if (rawError && typeof rawError === 'object') {
+        displayError = (rawError as any).message || (rawError as any).error || JSON.stringify(rawError);
+      }
+      setErrorMessage(displayError);
       triggerShake();
     }
   };
@@ -272,7 +294,7 @@ export const ProtectedGate: React.FC<ProtectedGateProps> = ({ children }) => {
                 }}
               >
                 <span>⚠️</span>
-                <span>{errorMessage}</span>
+                <span>{typeof errorMessage === 'string' ? errorMessage : 'Incorrect passphrase. Please try again! 🌸'}</span>
               </p>
             )}
           </div>

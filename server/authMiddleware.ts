@@ -53,7 +53,7 @@ export function loadEnvConfig(rootDir: string): AuthConfig {
 }
 
 // Cookie parser helper
-function parseCookies(header?: string): Record<string, string> {
+export function parseCookies(header?: string): Record<string, string> {
   const list: Record<string, string> = {};
   if (!header) return list;
   for (const cookie of header.split(';')) {
@@ -105,14 +105,14 @@ export function verifyPassphrase(input: string, correct: string): boolean {
 }
 
 // Helper to send JSON response
-function sendJson(res: ServerResponse, statusCode: number, data: unknown) {
+export function sendJson(res: ServerResponse, statusCode: number, data: unknown) {
   res.statusCode = statusCode;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(data));
 }
 
 // Helper to determine Content-Type
-function getMimeType(filePath: string): string {
+export function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   switch (ext) {
     case '.jpg':
@@ -136,7 +136,7 @@ function getMimeType(filePath: string): string {
 }
 
 // Helper to read JSON request body
-function readBody(req: IncomingMessage): Promise<string> {
+export function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', (chunk) => {
